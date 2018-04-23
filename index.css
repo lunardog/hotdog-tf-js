@@ -12,7 +12,8 @@ body, html {
 #content {
     background: #333;
     width: 100%;
-    padding: 16px 0;
+    margin: 16px 0;
+    padding:  16px 0;
     cursor: pointer;
     text-align: center;
     display: inline-block;
@@ -26,11 +27,12 @@ body, html {
 
 .message {
     text-align: center;
-    font-size: 44px;
-    line-height: 440px;
+    color: #ccc;
+    font-size: 60px;
+    line-height: 480px;
 }
 
 .message:hover {
     background: #222;
-    color: #F90;
+    color: #fff;
 }

@@ -13,7 +13,7 @@
         <div class="message" v-if="!playing">▶</div>
         <canvas id="the_canvas" width="640" height="480" v-show="playing"></canvas>
       </div>
-      <h1>{{message}}</h1>
+       <h3>{{message}}</h3>
       <video id="the_video" v-bind:src="url" width="640" height="480" style="display: none"></video>
     </div>
 
