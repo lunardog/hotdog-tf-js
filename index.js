@@ -23,7 +23,7 @@ function postprocess(tensor, pixeldata, width, height) {
     var grayscale = pixeldata.mean(2).expandDims(2)
 
     // grayscale = grayscale * (1 - heatmap) * 0.5 (to darken)
-    grayscale = tf.onesLike(heatmap).sub(heatmap).mul(grayscale).squeeze().mul(tf.scalar(0.5))
+    grayscale = tf.onesLike(heatmap).sub(heatmap).mul(grayscale).squeeze().mul(tf.scalar(0.3))
     // stack grayscale data on all 3 channels
     grayscaleStacked = tf.stack([grayscale, grayscale, grayscale]).transpose([1,2,0])
 
@@ -43,41 +43,84 @@ function postprocess(tensor, pixeldata, width, height) {
     return composite.toInt()
 }
 
-(async function() {
 
-    // the model will load later
-    var model = null
+var app = new Vue({
+  el: '#app',
+  data: {
+    model: null,
+    video: null,
+    offscreen: null,
+    onscreen: null,
+    url: '',
+    playing: false,
+    loopFrame: null
+  },
 
-    // create an offscreen canvas to draw on
-    var offscreenCanvas = document.createElement("canvas")
-    offscreenCanvas.width = 640
-    offscreenCanvas.height = 480
-    var offscreen = offscreenCanvas.getContext("2d")
-
-    // get the onscreen canvas
-    var onscreenCanvas = document.getElementById("the_canvas")
-    var onscreen = onscreenCanvas.getContext("2d")
-
-    loopFrame = null
-
-    // get the video object
-    var video = document.getElementById("the_video")
-
-    // this loop will run every frame
-    var loop = async function() {
-        if (!model) {
-            model = await tf.loadModel('model/model.json')
+  computed: {
+    message: function() {
+        if (!this.model) {
+            return "Loading model"
+        } else {
+            if (!this.playing) {
+                return "Tap to start"
+            } else {
+                return "Go find a hot dog!"
+            }
         }
+    },
+    buttonText: function() {
+        return this.playing ? "Pause" : "Play"
+    }
+  },
 
+  methods: {
+    loadModel: function() {
+        return tf.loadModel('model/model.json').then(loadedModel => {
+            this.model = loadedModel
+            return loadedModel
+        })
+    },
+
+    getCamera: function() {
+        return navigator.mediaDevices.getUserMedia({ audio: false, video: true })
+            .then(this.setVideoUrlFromStream)
+    },
+
+    setVideoUrlFromStream(stream) {
+        this.url = window.URL.createObjectURL(stream)
+    },
+
+    togglePlay: function() {
+        if (!this.video) {
+            return
+        }
+        if (this.playing) {
+            this.video.pause()
+            this.playing = !this.playing
+        } else {
+            this.video.play()
+            this.playing = !this.playing
+        }
+    },
+
+    continue: function() {
+        this.loopFrame = requestAnimationFrame(this.loop)
+    },
+
+    loop: async function() {
+        if (!this.model || !this.playing) {
+            this.continue()
+            return
+        }
         // copy camera image to convas
-        offscreen.drawImage(video, 0, 0, 640, 480)
+        this.offscreen.drawImage(this.video, 0, 0, 640, 480)
 
         // read the pixels from canvas
-        var imageData = offscreen.getImageData(0, 0, 640, 480)
+        var imageData = this.offscreen.getImageData(0, 0, 640, 480)
         var pixeldata = tf.fromPixels(imageData)
 
         // use the model to predict response
-        var response = await tf.tidy(() => model.predict(preprocess(pixeldata)))
+        var response = await tf.tidy(() => this.model.predict(preprocess(pixeldata)))
         responseData = await postprocess(response, pixeldata, 640, 480).data()
 
         // copy the loaded tensor to imageData
@@ -86,17 +129,25 @@ function postprocess(tensor, pixeldata, width, height) {
         }
 
         // paste the result on screen
-        onscreen.putImageData(imageData, 0, 0);
-        loopFrame = requestAnimationFrame(loop);
+        this.onscreen.putImageData(imageData, 0, 0)
+        this.continue()
     }
 
-    // ask for camera access
-    navigator.mediaDevices.getUserMedia({ audio: false, video: true })
-        .then(stream => {
-            video.src = window.URL.createObjectURL(stream)
-            loopFrame = requestAnimationFrame(loop)
-        })
+  },
 
-})()
+  created: function() {
+    this.loadModel().then(this.getCamera).then(() => {
+        this.video = document.getElementById("the_video")
+        var offscreenCanvas = document.createElement("canvas")
+        offscreenCanvas.width = 640
+        offscreenCanvas.height = 480
+        this.offscreen = offscreenCanvas.getContext("2d")
+        // get the onscreen canvas
+        var onscreenCanvas = document.getElementById("the_canvas")
+        this.onscreen = onscreenCanvas.getContext("2d")
+        this.continue()
 
+    })
+  }
 
+})
