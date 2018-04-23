@@ -2,17 +2,21 @@
   <head>
     <!-- Load TensorFlow.js -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.9.0"> </script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <!-- Place your code in the script tag below. You can also use an external .js file -->
-    <script>
-    </script>
+    <link rel="stylesheet" href="index.css"/>
   </head>
 
   <body>
-    <h1>Point your webcam at a hotdog</h1>
     <div id="app">
-      <video id="the_video" src="" autoplay="true" width="640" height="480" style="display:none"></video>
-      <canvas id="the_canvas" width="640" height="480"></canvas>
+      <div id="content" v-on:click="togglePlay">
+        <div class="message" v-if="!playing">▶</div>
+        <canvas id="the_canvas" width="640" height="480" v-show="playing"></canvas>
+      </div>
+      <h1>{{message}}</h1>
+      <video id="the_video" v-bind:src="url" width="640" height="480" style="display: none"></video>
     </div>
+
     <script type="text/javascript" src="index.js">
     </script>
   </body>

@@ -1,0 +1,36 @@
+body, html {
+    border: 0;
+    margin: 0;
+    background: #000;
+}
+
+#app {
+    font-family: sans-serif, helvetica, Verdana, Arial;
+    color: #ccc;
+}
+
+#content {
+    background: #333;
+    width: 100%;
+    padding: 16px 0;
+    cursor: pointer;
+    text-align: center;
+    display: inline-block;
+}
+
+#content > * {
+    width: 640px;
+    height: 480px;
+    margin: 0 auto;
+}
+
+.message {
+    text-align: center;
+    font-size: 44px;
+    line-height: 440px;
+}
+
+.message:hover {
+    background: #222;
+    color: #F90;
+}
