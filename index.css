@@ -36,3 +36,9 @@ body, html {
     background: #1d2021;
     color: #b8bb26;
 }
+
+.bar {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
