@@ -27,3 +27,4 @@ Just see it online [HERE](https://tokyo-ml.github.io/hotdog-tf-js/). It's hosted
 
 ## Disclaimer
 
+The project wouldn't be possible without the genrosity of my employer, Cookpad Inc, dedicated to Making Everyday Cooking Fun. If you'd like to know more about Cookpad, please check our [corporate site](https://info.cookpad.com/en) and especially the [open positions](https://info.cookpad.com/en/careers) if you're interested in joining us.
