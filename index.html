@@ -9,11 +9,13 @@
 
   <body>
     <div id="app">
-      <div id="content" v-on:click="togglePlay">
-        <div class="message" v-if="!playing">▶</div>
-        <canvas id="the_canvas" width="640" height="480" v-show="playing"></canvas>
+      <div id="content">
+        <div class="message" v-if="!playing" v-on:click="togglePlay">▶</div>
+        <canvas id="the_canvas" width="640" height="480" v-show="playing" v-on:click="togglePlay"></canvas>
       </div>
-       <h3>{{message}}</h3>
+      <div class="bar">
+        <h3>{{message}}</h3>
+      </div>
       <video id="the_video" v-bind:src="url" width="640" height="480" style="display: none"></video>
     </div>
 

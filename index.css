@@ -1,16 +1,16 @@
 body, html {
     border: 0;
     margin: 0;
-    background: #000;
+    background: #1d2021;
 }
 
 #app {
     font-family: sans-serif, helvetica, Verdana, Arial;
-    color: #ccc;
+    color: #eddbb2;
 }
 
 #content {
-    background: #333;
+    background: #282828;
     width: 100%;
     margin: 16px 0;
     padding:  16px 0;
@@ -27,12 +27,18 @@ body, html {
 
 .message {
     text-align: center;
-    color: #ccc;
+    color: #98971a;
     font-size: 60px;
     line-height: 480px;
 }
 
 .message:hover {
-    background: #222;
-    color: #fff;
+    background: #1d2021;
+    color: #b8bb26;
+}
+
+.bar {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
 }

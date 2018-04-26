@@ -59,7 +59,7 @@ var app = new Vue({
   computed: {
     message: function() {
         if (!this.model) {
-            return "Loading model"
+            return "Loading the model"
         } else {
             if (!this.playing) {
                 return "Tap to start"
@@ -82,7 +82,8 @@ var app = new Vue({
     },
 
     getCamera: function() {
-        return navigator.mediaDevices.getUserMedia({ audio: false, video: true })
+        return navigator.mediaDevices
+            .getUserMedia({ audio: false, video: true }) // returns Promise(stream)
             .then(this.setVideoUrlFromStream)
     },
 
@@ -91,6 +92,7 @@ var app = new Vue({
     },
 
     togglePlay: function() {
+        // exit if clicked too early
         if (!this.video) {
             return
         }
@@ -137,14 +139,20 @@ var app = new Vue({
 
   created: function() {
     this.loadModel().then(this.getCamera).then(() => {
+
         this.video = document.getElementById("the_video")
+
+        // get the offscreen canvas
         var offscreenCanvas = document.createElement("canvas")
         offscreenCanvas.width = 640
         offscreenCanvas.height = 480
         this.offscreen = offscreenCanvas.getContext("2d")
+
         // get the onscreen canvas
         var onscreenCanvas = document.getElementById("the_canvas")
         this.onscreen = onscreenCanvas.getContext("2d")
+
+        // start the loop
         this.continue()
 
     })
