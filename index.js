@@ -117,7 +117,6 @@ var app = new Vue({
         })
     },
 
-
     togglePlay: function() {
         // exit if clicked too early
         if (!this.video) {
@@ -150,7 +149,7 @@ var app = new Vue({
 
         // use the model to predict response
         var response = await tf.tidy(() => this.model.predict(preprocess(pixeldata)))
-        responseData = await postprocess(response, pixeldata, 640, 480).data()
+        responseData = await tf.tidy(() => postprocess(response, pixeldata, 640, 480)).data()
 
         // copy the loaded tensor to imageData
         for (var i = 0; i < responseData.length; i+=1) {
