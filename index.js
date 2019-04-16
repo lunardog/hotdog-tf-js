@@ -1,3 +1,14 @@
+// first deal with browser prefixes
+var getUserMedia = navigator.getUserMedia ||
+    navigator.mozGetUserMedia ||
+    navigator.webkitGetUserMedia;
+
+// make sure it's supported and bind to navigator
+if (getUserMedia) {
+    getUserMedia = getUserMedia.bind(navigator);
+} else {
+    // have to figure out how to handle the error somehow
+}
 
 function preprocess(pixeldata) {
 
@@ -49,6 +60,7 @@ var app = new Vue({
   data: {
     model: null,
     video: null,
+    webcam: null,
     offscreen: null,
     onscreen: null,
     url: '',
@@ -75,21 +87,36 @@ var app = new Vue({
 
   methods: {
     loadModel: function() {
-        return tf.loadModel('model/model.json').then(loadedModel => {
+        return tf.loadLayersModel('model/model.json').then(loadedModel => {
             this.model = loadedModel
             return loadedModel
         })
     },
 
     getCamera: function() {
-        return navigator.mediaDevices
-            .getUserMedia({ audio: false, video: true }) // returns Promise(stream)
-            .then(this.setVideoUrlFromStream)
+        var webcam = this.video
+        return new Promise(function(resolve, reject) {
+          getUserMedia(
+            {
+              video: {
+                height: 240,
+                width: 320,
+                facingMode: 'user',
+              }, audio: false},
+            stream => {
+              webcam.srcObject = stream;
+              this.url = stream
+              webcam.onloadedmetadata = (e) => {
+                webcam.width = webcam.videoWidth;
+                webcam.height = webcam.videoHeight;
+                return webcam.play().then(resolve)
+              }
+            },
+            error => reject
+          )
+        })
     },
 
-    setVideoUrlFromStream(stream) {
-        this.url = window.URL.createObjectURL(stream)
-    },
 
     togglePlay: function() {
         // exit if clicked too early
@@ -119,7 +146,7 @@ var app = new Vue({
 
         // read the pixels from canvas
         var imageData = this.offscreen.getImageData(0, 0, 640, 480)
-        var pixeldata = tf.fromPixels(imageData)
+        var pixeldata = tf.browser.fromPixels(imageData)
 
         // use the model to predict response
         var response = await tf.tidy(() => this.model.predict(preprocess(pixeldata)))
@@ -138,10 +165,11 @@ var app = new Vue({
   },
 
   created: function() {
-    this.loadModel().then(this.getCamera).then(() => {
+    this.video = document.getElementById("the_video")
 
-        this.video = document.getElementById("the_video")
-
+    this.loadModel()
+      .then(this.getCamera)
+      .then(() => {
         // get the offscreen canvas
         var offscreenCanvas = document.createElement("canvas")
         offscreenCanvas.width = 640
