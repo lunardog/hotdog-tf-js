@@ -34,7 +34,7 @@ function postprocess(tensor, pixeldata, width, height) {
     var grayscale = pixeldata.mean(2).expandDims(2)
 
     // grayscale = grayscale * (1 - heatmap) * 0.5 (to darken)
-    grayscale = tf.onesLike(heatmap).sub(heatmap).mul(grayscale).squeeze().mul(tf.scalar(0.3))
+    grayscale = tf.onesLike(heatmap).sub(heatmap).mul(grayscale).squeeze().mul(tf.scalar(0.5))
     // stack grayscale data on all 3 channels
     grayscaleStacked = tf.stack([grayscale, grayscale, grayscale]).transpose([1,2,0])
 
@@ -99,8 +99,8 @@ var app = new Vue({
           getUserMedia(
             {
               video: {
-                height: 240,
-                width: 320,
+                height: 480,
+                width: 640,
                 facingMode: 'user',
               }, audio: false},
             stream => {
